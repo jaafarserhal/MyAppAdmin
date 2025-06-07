@@ -1,0 +1,14 @@
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/bin/Debug/net8.0/MyApp.Core.deps.json
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/bin/Debug/net8.0/MyApp.Core.runtimeconfig.json
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/bin/Debug/net8.0/MyApp.Core.dll
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/bin/Debug/net8.0/MyApp.Core.pdb
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.csproj.AssemblyReference.cache
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.AssemblyInfoInputs.cache
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.AssemblyInfo.cs
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.csproj.CoreCompileInputs.cache
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.dll
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/refint/MyApp.Core.dll
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.pdb
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.genruntimeconfig.cache
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/ref/MyApp.Core.dll

@@ -1,0 +1,19 @@
+{
+  "Version": 1,
+  "Hash": "kOObD51seyPgMxS+IoYk0N86abQErDLIPHZn+gBpVOw=",
+  "Source": "MyApp.Web.Api",
+  "BasePath": "_content/MyApp.Web.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "MyApp.Web.Api/wwwroot",
+      "Source": "MyApp.Web.Api",
+      "ContentRoot": "/Users/jaafarserhal/Desktop/MyApp/MyApp.Web.Api/wwwroot/",
+      "BasePath": "_content/MyApp.Web.Api",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}
