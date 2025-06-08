@@ -30,6 +30,10 @@ MyApp.Web.Api/ClientApp/dist-ssr/
 *.sln
 *.sw?
 
+# Ignore build directories (e.g., for .NET, Java, etc.)
+/MyApp.Web.Api/bin/
+/MyApp.Web.Api/obj/
+
 
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
