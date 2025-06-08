@@ -15,7 +15,7 @@ import {
   Tooltip
 } from '@mui/material';
 
-import SidebarMenu from './SidebarMenu';
+import SidebarMenu from './SidebarMenu/Index'
 import Logo from 'src/components/LogoSign';
 
 const SidebarWrapper = styled(Box)(
@@ -80,7 +80,7 @@ function Sidebar() {
           }}
         />
         <Box p={2}>
-          <Button
+          {/* <Button
             href="https://bloomui.com"
             target="_blank"
             rel="noopener noreferrer"
@@ -90,7 +90,7 @@ function Sidebar() {
             fullWidth
           >
             Upgrade to PRO
-          </Button>
+          </Button> */}
         </Box>
       </SidebarWrapper>
       <Drawer
