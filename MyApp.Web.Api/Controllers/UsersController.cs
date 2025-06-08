@@ -13,26 +13,27 @@ namespace MyApp.Web.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersControllers : ControllerBase
+    public class UsersController : ControllerBase
     {
-        private readonly ILogger<UsersControllers> _logger;
+        private readonly ILogger<UsersController> _logger;
         private readonly IUserBuilder _userService;
 
-        public UsersControllers(ILogger<UsersControllers> logger, IUserBuilder userService)
+        public UsersController(ILogger<UsersController> logger, IUserBuilder userService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _logger = logger;
         }
 
     [HttpGet]
-   public ActionResult<ServiceResult<List<UserDto>>> GetUsers()
+    public async Task<ActionResult<ServiceResult<List<UserDto>>>> GetUsers()
     {
-        var data = _userService.GetAllUsersAsync();
-        
-        if (data.Result.IsSuccess)
+        var data = await _userService.GetAllUsersAsync();
+
+        if (data.IsSuccess)
             return Ok(data);
 
         return BadRequest(data);
     }
+
     }
 }
