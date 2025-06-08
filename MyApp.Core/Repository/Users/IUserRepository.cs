@@ -13,5 +13,7 @@ namespace MyApp.Core.Repository.Users
         Task<User> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(int userId);
         Task<IEnumerable<User>> GetAllUsersAsync();
+
+        Task<IEnumerable<User>> GetUsersAsync(int page, int limit);
     }
 }

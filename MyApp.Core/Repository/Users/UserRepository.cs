@@ -53,8 +53,18 @@ namespace MyApp.Core.Repository.Users
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _context.Users
-                                 .ToListAsync();
+            return await _context.Users.ToListAsync();
         }
+
+        public async Task<IEnumerable<User>> GetUsersAsync(int page, int limit)
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .OrderBy(u => u.UserId)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+        }
+
     }
 }

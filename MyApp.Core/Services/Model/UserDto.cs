@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyApp.Core.Builder.Model
+namespace MyApp.Core.Services.Model
 {
     public class UserDto
     {

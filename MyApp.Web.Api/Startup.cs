@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Core.Data;
 using MyApp.Core.Repository.Users;
-using MyApp.Core.Builder;
+using MyApp.Core.Services;
+using MyApp.Core.Utilities;
 
 
 namespace MyApp.Web.Api
@@ -32,7 +33,7 @@ namespace MyApp.Web.Api
             });
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(Configuration.GetConnectionString(AppConstants.DEV_CONNECTION_NAME)));
 
             // Register repositories and builders
             RegisterServices(services);
@@ -69,7 +70,7 @@ namespace MyApp.Web.Api
         private void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserBuilder, UserBuilder>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

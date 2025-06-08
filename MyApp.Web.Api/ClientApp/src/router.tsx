@@ -6,6 +6,7 @@ import SidebarLayout from 'src/layouts/SidebarLayout';
 import BaseLayout from 'src/layouts/BaseLayout';
 
 import SuspenseLoader from 'src/components/SuspenseLoader';
+import Users from './portal/users/Index';
 
 const Loader = (Component) => (props) =>
   (
@@ -83,10 +84,10 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/',
-        element: <Transactions />
+        element: <Users />
       },
       {
-        path: 'Stores',
+        path: 'Users',
         element: <Navigate to="/" replace />
       }
     ]

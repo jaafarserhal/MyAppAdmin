@@ -191,7 +191,7 @@ function SidebarMenu() {
                   to="/"
                   startIcon={<TableChartTwoToneIcon />}
                 >
-                 Stores
+                 Users
                 </Button>
             </ListItem>
           </List>
