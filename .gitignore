@@ -6,6 +6,16 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.sln
+*.dll
+*.pdb
+*.cache
+*.sourcelink.json
+
+# Optional: Ignore build output
+bin/
+obj/
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
