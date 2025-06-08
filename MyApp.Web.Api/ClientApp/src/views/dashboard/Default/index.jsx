@@ -27,7 +27,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         // Simulate a delay for loading state
-        await axios.get('https://localhost:5001/WeatherForecast/'); // Example API call
+        await axios.get('https://localhost:5001/api/users/'); // Example API call
       } catch (error) {
         console.error('Error fetching data:', error);
       }

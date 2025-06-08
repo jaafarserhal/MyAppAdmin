@@ -18,16 +18,10 @@ namespace MyApp.Core.Repository.Users
         public async Task<User> GetUserByIdAsync(int userId)
         {
             return await _context.Users
-                                 .Include(u => u.Stores) // Include related stores if necessary
                                  .FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
-        public async Task<User> GetUserByUsernameAsync(string username)
-        {
-            return await _context.Users
-                                 .Include(u => u.Stores) // Include related stores if necessary
-                                 .FirstOrDefaultAsync(u => u.Username == username);
-        }
+
 
         public async Task<User> CreateUserAsync(User user)
         {
@@ -39,7 +33,6 @@ namespace MyApp.Core.Repository.Users
 
         public async Task<User> UpdateUserAsync(User user)
         {
-            user.UpdatedAt = DateTime.UtcNow;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return user;
@@ -61,7 +54,6 @@ namespace MyApp.Core.Repository.Users
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _context.Users
-                                 .Include(u => u.Stores) // Include related stores if necessary
                                  .ToListAsync();
         }
     }

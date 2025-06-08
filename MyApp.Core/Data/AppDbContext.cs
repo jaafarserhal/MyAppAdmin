@@ -16,6 +16,14 @@ public partial class AppDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Customer> Customers { get; set; }
+
+    public virtual DbSet<GenLookup> GenLookups { get; set; }
+
+    public virtual DbSet<GenLookuptype> GenLookuptypes { get; set; }
+
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<Store> Stores { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -26,44 +34,137 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Customer>(entity =>
+        {
+            entity.HasKey(e => e.CustomerId).HasName("customers_pkey");
+
+            entity.ToTable("customers");
+
+            entity.HasIndex(e => e.Email, "idx_customers_email");
+
+            entity.HasIndex(e => new { e.Latitude, e.Longitude }, "idx_customers_lat_lon");
+
+            entity.HasIndex(e => e.Phone, "idx_customers_phone");
+
+            entity.HasIndex(e => e.UserId, "idx_customers_user_id").IsUnique();
+
+            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.Address).HasColumnName("address");
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("email");
+            entity.Property(e => e.Latitude)
+                .HasPrecision(10, 7)
+                .HasColumnName("latitude");
+            entity.Property(e => e.Longitude)
+                .HasPrecision(10, 7)
+                .HasColumnName("longitude");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(150)
+                .HasColumnName("name");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .HasColumnName("phone");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithOne(p => p.Customer)
+                .HasForeignKey<Customer>(d => d.UserId)
+                .HasConstraintName("fk_user");
+        });
+
+        modelBuilder.Entity<GenLookup>(entity =>
+        {
+            entity.HasKey(e => e.LookupId).HasName("gen_lookup_pkey");
+
+            entity.ToTable("gen_lookup");
+
+            entity.Property(e => e.LookupId).HasColumnName("lookup_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.LookupTypeId).HasColumnName("lookup_type_id");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("name");
+
+            entity.HasOne(d => d.LookupType).WithMany(p => p.GenLookups)
+                .HasForeignKey(d => d.LookupTypeId)
+                .HasConstraintName("fk_lookup_type");
+        });
+
+        modelBuilder.Entity<GenLookuptype>(entity =>
+        {
+            entity.HasKey(e => e.LookupTypeId).HasName("gen_lookuptype_pkey");
+
+            entity.ToTable("gen_lookuptype");
+
+            entity.HasIndex(e => e.Name, "gen_lookuptype_name_key").IsUnique();
+
+            entity.Property(e => e.LookupTypeId).HasColumnName("lookup_type_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoleId).HasName("roles_pkey");
+
+            entity.ToTable("roles");
+
+            entity.HasIndex(e => e.Name, "roles_name_key").IsUnique();
+
+            entity.Property(e => e.RoleId).HasColumnName("role_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("name");
+        });
+
         modelBuilder.Entity<Store>(entity =>
         {
             entity.HasKey(e => e.StoreId).HasName("stores_pkey");
 
-            entity.ToTable("stores", tb => tb.HasComment("Stores owned by users with geolocation data"));
+            entity.ToTable("stores");
 
-            entity.HasIndex(e => e.IsActive, "idx_stores_active");
+            entity.HasIndex(e => e.CreatedAt, "idx_stores_created_at");
 
-            entity.HasIndex(e => new { e.City, e.State }, "idx_stores_city_state");
+            entity.HasIndex(e => e.IsActive, "idx_stores_is_active");
 
-            entity.HasIndex(e => new { e.Latitude, e.Longitude }, "idx_stores_location");
+            entity.HasIndex(e => e.IsVerified, "idx_stores_is_verified");
 
-            entity.HasIndex(e => e.AverageRating, "idx_stores_rating").IsDescending();
+            entity.HasIndex(e => new { e.Latitude, e.Longitude }, "idx_stores_lat_lon");
 
-            entity.HasIndex(e => e.UserId, "idx_stores_user_id");
-
-            entity.HasIndex(e => e.IsVerified, "idx_stores_verified");
+            entity.HasIndex(e => e.StoreCategoryId, "idx_stores_store_category_id");
 
             entity.Property(e => e.StoreId).HasColumnName("store_id");
-            entity.Property(e => e.Address)
-                .IsRequired()
-                .HasMaxLength(500)
-                .HasColumnName("address");
-            entity.Property(e => e.AverageRating)
-                .HasPrecision(3, 2)
-                .HasDefaultValueSql("0.00")
-                .HasColumnName("average_rating");
-            entity.Property(e => e.City)
-                .IsRequired()
-                .HasMaxLength(100)
-                .HasColumnName("city");
+            entity.Property(e => e.Address).HasColumnName("address");
             entity.Property(e => e.ClosingTime).HasColumnName("closing_time");
-            entity.Property(e => e.Country)
-                .HasMaxLength(50)
-                .HasDefaultValueSql("'USA'::character varying")
-                .HasColumnName("country");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Email)
@@ -76,110 +177,72 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValue(false)
                 .HasColumnName("is_verified");
             entity.Property(e => e.Latitude)
-                .HasPrecision(10, 8)
-                .HasComment("Latitude coordinate for store location")
+                .HasPrecision(10, 7)
                 .HasColumnName("latitude");
             entity.Property(e => e.Longitude)
-                .HasPrecision(11, 8)
-                .HasComment("Longitude coordinate for store location")
+                .HasPrecision(10, 7)
                 .HasColumnName("longitude");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(150)
+                .HasColumnName("name");
             entity.Property(e => e.OpeningTime).HasColumnName("opening_time");
             entity.Property(e => e.OperatingDays)
-                .HasMaxLength(20)
-                .HasDefaultValueSql("'Mon-Sun'::character varying")
+                .HasMaxLength(100)
                 .HasColumnName("operating_days");
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .HasColumnName("phone_number");
-            entity.Property(e => e.State)
-                .IsRequired()
-                .HasMaxLength(50)
-                .HasColumnName("state");
-            entity.Property(e => e.StoreImageUrl)
-                .HasMaxLength(500)
-                .HasColumnName("store_image_url");
-            entity.Property(e => e.StoreName)
-                .IsRequired()
-                .HasMaxLength(255)
-                .HasColumnName("store_name");
+            entity.Property(e => e.StoreCategoryId).HasColumnName("store_category_id");
+            entity.Property(e => e.StoreImageUrl).HasColumnName("store_image_url");
             entity.Property(e => e.TotalReviews)
                 .HasDefaultValue(0)
                 .HasColumnName("total_reviews");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.UserId)
-                .HasComment("Foreign key to users table - store owner")
-                .HasColumnName("user_id");
-            entity.Property(e => e.WebsiteUrl)
-                .HasMaxLength(500)
-                .HasColumnName("website_url");
-            entity.Property(e => e.ZipCode)
-                .HasMaxLength(20)
-                .HasColumnName("zip_code");
+            entity.Property(e => e.WebsiteUrl).HasColumnName("website_url");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Stores)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("stores_user_id_fkey");
+            entity.HasOne(d => d.StoreCategory).WithMany(p => p.Stores)
+                .HasForeignKey(d => d.StoreCategoryId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_store_category");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("users_pkey");
 
-            entity.ToTable("users", tb => tb.HasComment("Application users with location tracking"));
-
-            entity.HasIndex(e => e.IsActive, "idx_users_active");
-
-            entity.HasIndex(e => e.Email, "idx_users_email");
-
-            entity.HasIndex(e => new { e.CurrentLatitude, e.CurrentLongitude }, "idx_users_location");
-
-            entity.HasIndex(e => e.Username, "idx_users_username");
+            entity.ToTable("users");
 
             entity.HasIndex(e => e.Email, "users_email_key").IsUnique();
-
-            entity.HasIndex(e => e.Username, "users_username_key").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-            entity.Property(e => e.CurrentLatitude)
-                .HasPrecision(10, 8)
-                .HasComment("User current latitude for nearby searches")
-                .HasColumnName("current_latitude");
-            entity.Property(e => e.CurrentLongitude)
-                .HasPrecision(11, 8)
-                .HasComment("User current longitude for nearby searches")
-                .HasColumnName("current_longitude");
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(255)
                 .HasColumnName("email");
             entity.Property(e => e.FirstName)
+                .IsRequired()
                 .HasMaxLength(100)
                 .HasColumnName("first_name");
+            entity.Property(e => e.HashPassword)
+                .IsRequired()
+                .HasColumnName("hash_password");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
             entity.Property(e => e.LastName)
+                .IsRequired()
                 .HasMaxLength(100)
                 .HasColumnName("last_name");
-            entity.Property(e => e.PasswordHash)
-                .IsRequired()
-                .HasMaxLength(255)
-                .HasColumnName("password_hash");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(20)
-                .HasColumnName("phone_number");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.Username)
-                .IsRequired()
-                .HasMaxLength(50)
-                .HasColumnName("username");
+            entity.Property(e => e.RoleId).HasColumnName("role_id");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_role");
         });
 
         OnModelCreatingPartial(modelBuilder);

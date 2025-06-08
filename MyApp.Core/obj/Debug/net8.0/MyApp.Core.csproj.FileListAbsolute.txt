@@ -12,3 +12,4 @@
 /Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.pdb
 /Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.genruntimeconfig.cache
 /Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/ref/MyApp.Core.dll
+/Users/jaafarserhal/Desktop/MyApp/MyApp.Core/obj/Debug/net8.0/MyApp.Core.sourcelink.json

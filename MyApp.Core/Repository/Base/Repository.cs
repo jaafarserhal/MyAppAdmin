@@ -7,7 +7,7 @@ using MyApp.Core.Data;
 
 namespace My.Core.Repository.Base
 {
-    public abstract class Repository<T> : IRepository<T, AppDbContext> where T : class
+    public abstract class Repository<T> : IRepository<T> where T : class
     {
         protected readonly AppDbContext _context;
         private DbSet<T> _dbSet;
