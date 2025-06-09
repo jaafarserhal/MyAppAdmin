@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MyApp.Core.Models;
 using MyApp.Core.Services.Model;
 using MyApp.Core.Utilities;
 
@@ -16,5 +17,7 @@ namespace MyApp.Core.Services
         /// <param name="take"></param>
         /// <returns></returns>
         Task<ServiceResult<IEnumerable<UserDto>>> GetUsersAsync(int skip, int take);
+
+        Task<User> AuthenticateAsync(string username, string password);
     }
 }

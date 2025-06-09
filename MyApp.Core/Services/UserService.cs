@@ -18,6 +18,28 @@ namespace MyApp.Core.Services
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        public async Task<User> AuthenticateAsync(string username, string password)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                {
+                    _logger.LogWarning("Authentication failed: Username or password is empty");
+                    return null;
+                }
+                var user = await _userRepository.GetByUsernameAsync(username);
+
+                if (user.HashPassword != password) return null;
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during authentication");
+                return null;
+            }
+        }
    
         public async Task<ServiceResult<IEnumerable<UserDto>>> GetUsersAsync(int page = 1, int limit = 10)
         {

@@ -15,6 +15,12 @@ namespace MyApp.Core.Repository.Users
         public UserRepository(AppDbContext context) : base(context)
         {
         }
+
+        public async Task<User> GetByUsernameAsync(string username)
+        {
+
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == username);
+        }
         public async Task<User> GetUserByIdAsync(int userId)
         {
             return await _context.Users

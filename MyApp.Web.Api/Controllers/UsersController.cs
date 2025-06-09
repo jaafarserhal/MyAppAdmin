@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MyApp.Core.Services;
 using MyApp.Core.Services.Model;
 using MyApp.Core.Utilities;
@@ -16,21 +21,50 @@ namespace MyApp.Web.Api.Controllers
     {
         private readonly ILogger<UsersController> _logger;
         private readonly IUserService _userService;
+        private readonly string _jwtSecret;
 
-        public UsersController(ILogger<UsersController> logger, IUserService userService)
+        public UsersController(IConfiguration config, ILogger<UsersController> logger, IUserService userService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _logger = logger;
+            _jwtSecret = config["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey");
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto login)
+        {
+            var user = await _userService.AuthenticateAsync(login.Email, login.Password);
+            if (user == null)
+                return Unauthorized();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSecret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] {
+                new Claim(ClaimTypes.Name, login.Email)
+            }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
+
+            return Ok(new { token = jwt, email = login.Email });
+        }
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ServiceResult<IEnumerable<UserDto>>>> GetUsers([FromQuery] int page = 1, [FromQuery] int limit = 10)
         {
             var data = await _userService.GetUsersAsync(page, limit);
-
             if (data.IsSuccess)
                 return Ok(data);
-
             return BadRequest(data);
         }
     }

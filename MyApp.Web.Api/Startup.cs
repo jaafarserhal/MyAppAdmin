@@ -3,6 +3,10 @@ using MyApp.Core.Data;
 using MyApp.Core.Repository.Users;
 using MyApp.Core.Services;
 using MyApp.Core.Utilities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using MyApp.Core.Services.Model;
 
 
 namespace MyApp.Web.Api
@@ -19,6 +23,24 @@ namespace MyApp.Web.Api
         // Register services
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // Bind JwtSettings from config
+            var jwtSettingsSection = Configuration.GetSection("JwtSettings");
+            services.Configure<JwtSettings>(jwtSettingsSection);
+            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                };
+            });
+            services.AddAuthorization();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
 
@@ -55,6 +77,7 @@ namespace MyApp.Web.Api
 
             app.UseCors("AllowReactApp");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

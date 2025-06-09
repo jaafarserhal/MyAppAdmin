@@ -8,6 +8,7 @@ namespace MyApp.Core.Repository.Users
 {
     public interface IUserRepository
     {
+        Task<User> GetByUsernameAsync(string username);
         Task<User> GetUserByIdAsync(int userId);
         Task<User> CreateUserAsync(User user);
         Task<User> UpdateUserAsync(User user);

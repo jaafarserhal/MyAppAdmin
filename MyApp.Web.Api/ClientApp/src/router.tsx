@@ -7,13 +7,14 @@ import BaseLayout from 'src/layouts/BaseLayout';
 
 import SuspenseLoader from 'src/components/SuspenseLoader';
 import Users from './portal/users/Index';
+import Login from './portal/auth/Login';
 
 const Loader = (Component) => (props) =>
-  (
-    <Suspense fallback={<SuspenseLoader />}>
-      <Component {...props} />
-    </Suspense>
-  );
+(
+  <Suspense fallback={<SuspenseLoader />}>
+    <Component {...props} />
+  </Suspense>
+);
 
 // Pages
 
@@ -78,7 +79,7 @@ const StatusMaintenance = Loader(
 );
 
 const routes: RouteObject[] = [
-{
+  {
     path: '',
     element: <SidebarLayout />,
     children: [
@@ -91,9 +92,23 @@ const routes: RouteObject[] = [
         element: <Navigate to="/" replace />
       }
     ]
-}
-
+  },
+  {
+    path: '/auth',
+    element: <BaseLayout />,
+    children: [
+      {
+        path: 'login',
+        element: <Login />
+      },
+      {
+        path: '',
+        element: <Navigate to="login" replace />
+      }
+    ]
+  }
 ];
+
 
 // const routes: RouteObject[] = [
 //   {
