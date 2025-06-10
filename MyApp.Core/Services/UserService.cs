@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using MyApp.Core.Models;
 using MyApp.Core.Repository.Users;
 using MyApp.Core.Services.Model;
-using MyApp.Core.Utilities;
+using MyApp.Core.Common.Models;
 
 namespace MyApp.Core.Services
 {
@@ -40,7 +40,7 @@ namespace MyApp.Core.Services
                 return null;
             }
         }
-   
+
         public async Task<ServiceResult<IEnumerable<UserDto>>> GetUsersAsync(int page = 1, int limit = 10)
         {
             try

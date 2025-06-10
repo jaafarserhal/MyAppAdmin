@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyApp.Core.Services;
 using MyApp.Core.Services.Model;
-using MyApp.Core.Utilities;
+using MyApp.Core.Common.Models;
 
 namespace MyApp.Web.Api.Controllers
 {
@@ -55,7 +50,15 @@ namespace MyApp.Web.Api.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwt = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = jwt, email = login.Email });
+            var userResponse = new UserLoginResponse
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+            _logger.LogInformation("User {Email} logged in successfully", login.Email);
+
+            return Ok(new { token = jwt, user = userResponse });
         }
 
         [Authorize]

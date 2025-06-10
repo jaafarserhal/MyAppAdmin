@@ -6,7 +6,7 @@ using MyApp.Core.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MyApp.Core.Services.Model;
+using MyApp.Core.Common.Models;
 
 
 namespace MyApp.Web.Api

@@ -9,8 +9,12 @@ interface LoginFormData {
 
 interface LoginResponse {
     token: string;
-    email: string;
     message?: string;
+    user: {
+        email: string;
+        firstName: string;
+        lastName: string;
+    }
 }
 
 const Login: React.FC = () => {
@@ -18,7 +22,6 @@ const Login: React.FC = () => {
         email: '',
         password: ''
     });
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -81,8 +84,9 @@ const Login: React.FC = () => {
             // Store the JWT token
             localStorage.setItem('authToken', response.token);
 
+
             // Store user info if needed
-            localStorage.setItem('user', response.email);
+            localStorage.setItem('user', JSON.stringify(response.user));
 
             setIsAuthenticated(true);
 
@@ -288,7 +292,7 @@ const Login: React.FC = () => {
                     <input
                         id="password"
                         name="password"
-                        type={showPassword ? 'text' : 'password'}
+                        type={'password'}
                         autoComplete="current-password"
                         required
                         value={formData.password}

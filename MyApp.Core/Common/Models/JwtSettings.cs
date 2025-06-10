@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyApp.Core.Services.Model
+namespace MyApp.Core.Common.Models
 {
     public class JwtSettings
     {

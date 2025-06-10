@@ -18,7 +18,7 @@ function Footer() {
       >
         <Box>
           <Typography variant="subtitle1">
-            &copy; 2022 - Tokyo Free White React Typescript Admin Dashboard
+            &copy; 2025 - My Near By Stores Admin Dashboard
           </Typography>
         </Box>
         <Typography
@@ -27,14 +27,6 @@ function Footer() {
           }}
           variant="subtitle1"
         >
-          Crafted by{' '}
-          <Link
-            href="https://bloomui.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            BloomUI.com
-          </Link>
         </Typography>
       </Box>
     </FooterWrapper>

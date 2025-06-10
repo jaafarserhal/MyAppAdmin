@@ -70,7 +70,7 @@ function Status404() {
                   endAdornment={
                     <InputAdornment position="end">
                       <ButtonSearch variant="contained" size="small">
-                        Search
+                        Search2
                       </ButtonSearch>
                     </InputAdornment>
                   }

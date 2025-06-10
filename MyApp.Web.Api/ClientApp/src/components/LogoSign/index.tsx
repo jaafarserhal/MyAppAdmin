@@ -97,32 +97,32 @@ const TooltipWrapper = styled(({ className, ...props }: TooltipProps) => (
 function Logo() {
   const theme = useTheme();
 
-  return (
-    <TooltipWrapper
-      title="Tokyo Free White React Typescript Admin Dashboard"
-      arrow
-    >
-      <LogoWrapper to="/overview">
-        <Badge
-          sx={{
-            '.MuiBadge-badge': {
-              fontSize: theme.typography.pxToRem(11),
-              right: -2,
-              top: 8
-            }
-          }}
-          overlap="circular"
-          color="success"
-          badgeContent="2.0"
-        >
-          <LogoSignWrapper>
-            <LogoSign>
-              <LogoSignInner />
-            </LogoSign>
-          </LogoSignWrapper>
-        </Badge>
-      </LogoWrapper>
-    </TooltipWrapper>
+  return (<></>
+    //<TooltipWrapper
+    //   title="My Near By Stores Admin Dashboard"
+    //   arrow
+    // >
+    //   <LogoWrapper to="/overview">
+    //     <Badge
+    //       sx={{
+    //         '.MuiBadge-badge': {
+    //           fontSize: theme.typography.pxToRem(11),
+    //           right: -2,
+    //           top: 8
+    //         }
+    //       }}
+    //       overlap="circular"
+    //       color="success"
+    //       badgeContent="2.0"
+    //     >
+    //       <LogoSignWrapper>
+    //         <LogoSign>
+    //           <LogoSignInner />
+    //         </LogoSign>
+    //       </LogoSignWrapper>
+    //     </Badge>
+    //   </LogoWrapper>
+    // </TooltipWrapper>
   );
 }
 

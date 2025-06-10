@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MyApp.Core.Models;
 using MyApp.Core.Services.Model;
-using MyApp.Core.Utilities;
+using MyApp.Core.Common.Models;
 
 namespace MyApp.Core.Services
 {
