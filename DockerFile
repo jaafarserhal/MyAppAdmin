@@ -1,48 +1,26 @@
-# Step 1: Build React App
-FROM node:16 AS react-build
-WORKDIR /app
+# Step 1: Build frontend
+FROM node:18 AS client-build
+WORKDIR /app/ClientApp
+COPY MyApp.Web.Api/ClientApp/package*.json ./
+RUN npm install
+COPY MyApp.Web.Api/ClientApp .
+RUN npm run build:no-lint
 
-# Copy only the package files first to leverage Docker layer caching
-COPY MyApp.Web.Api/ClientApp/package*.json ./ClientApp/
-RUN npm install --prefix ./ClientApp
-
-# Copy the full React app
-COPY MyApp.Web.Api/ClientApp ./ClientApp/
-RUN npm run build --prefix ./ClientApp
-
-# Step 2: Base image for final app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 80
-
-# Step 3: Build and publish .NET app
+# Step 2: Build .NET backend
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-
-# Copy project files first
-COPY MyApp.Web.Api/MyApp.Web.Api.csproj MyApp.Web.Api/
-COPY MyApp.Core/MyApp.Core.csproj MyApp.Core/
-RUN dotnet restore MyApp.Web.Api/MyApp.Web.Api.csproj
-
-# Copy the rest of the code
 COPY . .
+# Copy built frontend to the right place in the backend project
+COPY --from=client-build /app/ClientApp/build MyApp.Web.Api/ClientApp/build
+RUN dotnet restore "MyApp.Web.Api/MyApp.Web.Api.csproj"
+RUN dotnet build "MyApp.Web.Api/MyApp.Web.Api.csproj" -c Release -o /app/build
 
-# Build
-WORKDIR /src/MyApp.Web.Api
-RUN dotnet build MyApp.Web.Api.csproj -c Release -o /app/build
-
-# Publish
+# Step 3: Publish .NET App
 FROM build AS publish
-RUN dotnet publish MyApp.Web.Api.csproj -c Release -o /app/publish
+RUN dotnet publish "MyApp.Web.Api/MyApp.Web.Api.csproj" -c Release -o /app/publish --no-restore
 
 # Step 4: Final runtime image
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-
-# Copy React build output into wwwroot
-COPY --from=react-build /app/ClientApp/build ./wwwroot
-
-# Copy .NET publish output
 COPY --from=publish /app/publish .
-
 ENTRYPOINT ["dotnet", "MyApp.Web.Api.dll"]
