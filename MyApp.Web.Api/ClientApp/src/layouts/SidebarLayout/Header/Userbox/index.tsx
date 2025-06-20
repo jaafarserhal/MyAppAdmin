@@ -47,6 +47,9 @@ const UserBoxLabel = styled(Typography)(
 function HeaderUserbox() {
   const storedUser = JSON.parse(localStorage.getItem('user'));
 
+  if (!storedUser) {
+    return null;
+  }
   const user = {
     name: `${storedUser.firstName} ${storedUser.lastName}`,
     email: storedUser.email,

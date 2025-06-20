@@ -11,7 +11,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
 # Copy built frontend to the right place in the backend project
-COPY --from=client-build /app/ClientApp/build MyApp.Web.Api/ClientApp/build
+COPY --from=client-build /app/ClientApp/build MyApp.Web.Api/wwwroot
 RUN dotnet restore "MyApp.Web.Api/MyApp.Web.Api.csproj"
 RUN dotnet build "MyApp.Web.Api/MyApp.Web.Api.csproj" -c Release -o /app/build
 
