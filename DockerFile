@@ -1,35 +1,48 @@
 # Step 1: Build React App
 FROM node:16 AS react-build
 WORKDIR /app
-COPY MyApp.Web.Api/ClientApp/package.json MyApp.Web.Api/ClientApp/package-lock.json ./ClientApp/
-RUN npm install
-COPY MyApp.Web.Api/ClientApp/. ./ClientApp/
+
+# Copy only the package files first to leverage Docker layer caching
+COPY MyApp.Web.Api/ClientApp/package*.json ./ClientApp/
+RUN npm install --prefix ./ClientApp
+
+# Copy the full React app
+COPY MyApp.Web.Api/ClientApp ./ClientApp/
 RUN npm run build --prefix ./ClientApp
 
-# Step 2: Build .NET API (ASP.NET Core) with .NET 8.0 SDK
+# Step 2: Base image for final app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-# Step 3: Restore dependencies and build the .NET application
+# Step 3: Build and publish .NET app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
+
+# Copy project files first
 COPY MyApp.Web.Api/MyApp.Web.Api.csproj MyApp.Web.Api/
 COPY MyApp.Core/MyApp.Core.csproj MyApp.Core/
 RUN dotnet restore MyApp.Web.Api/MyApp.Web.Api.csproj
-COPY . . 
+
+# Copy the rest of the code
+COPY . .
+
+# Build
 WORKDIR /src/MyApp.Web.Api
 RUN dotnet build MyApp.Web.Api.csproj -c Release -o /app/build
 
-# Step 4: Publish the .NET application
+# Publish
 FROM build AS publish
-RUN dotnet publish MyApp.Web.Api.csproj -c Release -o /app/publishaa
+RUN dotnet publish MyApp.Web.Api.csproj -c Release -o /app/publish
 
-# Step 5: Final Stage - Combine React and .NET API
+# Step 4: Final runtime image
 FROM base AS final
 WORKDIR /app
-# Copy the React build output to the wwwroot folder in the .NET API
-COPY --from=react-build /app/ClientApp/build /app/wwwroot
-# Copy the published .NET application files
-COPY --from=publish /app/publish /app
+
+# Copy React build output into wwwroot
+COPY --from=react-build /app/ClientApp/build ./wwwroot
+
+# Copy .NET publish output
+COPY --from=publish /app/publish .
+
 ENTRYPOINT ["dotnet", "MyApp.Web.Api.dll"]
