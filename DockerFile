@@ -6,12 +6,20 @@ RUN npm install
 COPY MyApp.Web.Api/ClientApp .
 RUN npm run build:no-lint
 
+# Verify build output
+RUN ls -la build/
+
 # Step 2: Build .NET backend
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
-# Copy built frontend to the right place in the backend project
+
+# Copy built frontend to the right place
 COPY --from=client-build /app/ClientApp/build MyApp.Web.Api/wwwroot
+
+# Verify files were copied
+RUN ls -la MyApp.Web.Api/wwwroot/
+
 RUN dotnet restore "MyApp.Web.Api/MyApp.Web.Api.csproj"
 RUN dotnet build "MyApp.Web.Api/MyApp.Web.Api.csproj" -c Release -o /app/build
 
@@ -19,8 +27,17 @@ RUN dotnet build "MyApp.Web.Api/MyApp.Web.Api.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "MyApp.Web.Api/MyApp.Web.Api.csproj" -c Release -o /app/publish --no-restore
 
+# Verify published files
+RUN ls -la /app/publish/wwwroot/
+
 # Step 4: Final runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Verify final files
+RUN ls -la wwwroot/
+
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "MyApp.Web.Api.dll"]

@@ -23,11 +23,11 @@ namespace MyApp.Web.Api
         // Register services
         public void ConfigureServices(IServiceCollection services)
         {
-
             // Bind JwtSettings from config
             var jwtSettingsSection = Configuration.GetSection("JwtSettings");
             services.Configure<JwtSettings>(jwtSettingsSection);
             var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+            
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -40,6 +40,7 @@ namespace MyApp.Web.Api
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
                 };
             });
+            
             services.AddAuthorization();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
@@ -53,12 +54,19 @@ namespace MyApp.Web.Api
                         "https://myappadmin.onrender.com"  // Production
                     )
                     .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    .AllowAnyMethod()
+                    .AllowCredentials(); // Add this if you're using cookies/credentials
                 });
             });
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString(AppConstants.DEV_CONNECTION_NAME)));
+
+            // Add SPA services
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "wwwroot";
+            });
 
             // Register repositories and builders
             RegisterServices(services);
@@ -74,9 +82,18 @@ namespace MyApp.Web.Api
 
             app.UseHttpsRedirection();
 
-            // Serve static files first
-            app.UseStaticFiles();
-            app.UseDefaultFiles();
+            // Static files configuration for SPA
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = context =>
+                {
+                    // Add cache headers for static assets
+                    if (context.File.Name.EndsWith(".js") || context.File.Name.EndsWith(".css"))
+                    {
+                        context.Context.Response.Headers.Add("Cache-Control", "public, max-age=31536000");
+                    }
+                }
+            });
 
             app.UseRouting();
 
@@ -86,13 +103,34 @@ namespace MyApp.Web.Api
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-             {
-                 // API routes
-                 endpoints.MapControllers();
+            {
+                // API routes
+                endpoints.MapControllers();
+            });
 
-                 // SPA fallback - this handles React Router routes
-                 endpoints.MapFallbackToFile("index.html");
-             });
+            // SPA fallback - handles React Router routes
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "wwwroot";
+                
+                if (env.IsDevelopment())
+                {
+                    // In development, proxy to React dev server if needed
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+                }
+                else
+                {
+                    // In production, serve the built React app
+                    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+                    {
+                        OnPrepareResponse = context =>
+                        {
+                            context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+                            context.Context.Response.Headers.Add("Expires", "-1");
+                        }
+                    };
+                }
+            });
         }
         /// <summary>
         /// Registers the services for dependency injection.
