@@ -48,9 +48,12 @@ namespace MyApp.Web.Api
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policy.WithOrigins(
+                        "http://localhost:3000",           // Development
+                        "https://myappadmin.onrender.com"  // Production
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
                 });
             });
 
@@ -70,6 +73,8 @@ namespace MyApp.Web.Api
             }
 
             app.UseHttpsRedirection();
+
+            // Serve static files first
             app.UseStaticFiles();
             app.UseDefaultFiles();
 
@@ -81,10 +86,13 @@ namespace MyApp.Web.Api
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapFallbackToFile("index.html");
-            });
+             {
+                 // API routes
+                 endpoints.MapControllers();
+
+                 // SPA fallback - this handles React Router routes
+                 endpoints.MapFallbackToFile("index.html");
+             });
         }
         /// <summary>
         /// Registers the services for dependency injection.
