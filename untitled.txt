@@ -1,0 +1,13 @@
+psql postgresql://my_app_db_ghzd_user:Ke0zA5H1tP0m5BVYP1rWRLr24S6vaEPE@dpg-d1a4gbje5dus73e825qg-a.oregon-postgres.render.com/my_app_db_ghzd -f ~/Desktop/SQL/database.sql
+
+
+
+psql postgresql://my_app_db_ghzd_user:Ke0zA5H1tP0m5BVYP1rWRLr24S6vaEPE@dpg-d1a4gbje5dus73e825qg-a.oregon-postgres.render.com/my_app_db_ghzd -c 'SELECT * FROM users LIMIT 5;'
+
+
+
+psql "postgresql://my_app_db_ghzd_user:Ke0zA5H1tP0m5BVYP1rWRLr24S6vaEPE@dpg-d1a4gbje5dus73e825qg-a.oregon-postgres.render.com:5432/my_app_db_ghzd?sslmode=require" -f ~/Desktop/SQL/database.sql
+
+
+
+docker build -t myapp .
