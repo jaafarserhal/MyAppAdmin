@@ -4,13 +4,13 @@
 namespace MyApp.Core.Utilities
 {
 
-    public enum Role
+    public enum RoleType
     {
         Undefined = 0,
         Admin = 1,
         StoreOwner = 2,
         Customer = 3
-       
+
     }
 
 

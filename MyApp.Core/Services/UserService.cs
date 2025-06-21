@@ -5,6 +5,7 @@ using MyApp.Core.Models;
 using MyApp.Core.Repository.Users;
 using MyApp.Core.Services.Model;
 using MyApp.Core.Common.Models;
+using MyApp.Core.Utilities;
 
 namespace MyApp.Core.Services
 {
@@ -76,5 +77,38 @@ namespace MyApp.Core.Services
             };
         }
 
+        #region App
+        public async Task<ServiceResult<User>> SignupAsync(User user)
+        {
+
+            try
+            {
+                var userExists = await _userRepository.GetByUsernameAsync(user.Email);
+                if (userExists != null)
+                {
+                    return ServiceResult<User>.Failure("User already exists");
+                }
+
+                var userDto = new User()
+                {
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    HashPassword = CommonUtilities.HashPassword(user.HashPassword),
+                    RoleId = RoleType.Customer.AsInt(),
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var createdUser = await _userRepository.CreateUserAsync(userDto);
+                return ServiceResult<User>.Success(createdUser);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during user signup");
+                return ServiceResult<User>.Failure("An unexpected error occurred during signup.");
+            }
+        }
+        #endregion
     }
 }

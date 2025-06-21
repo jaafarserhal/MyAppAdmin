@@ -19,5 +19,7 @@ namespace MyApp.Core.Services
         Task<ServiceResult<IEnumerable<UserDto>>> GetUsersAsync(int skip, int take);
 
         Task<User> AuthenticateAsync(string username, string password);
+
+        Task<ServiceResult<User>> SignupAsync(User user);
     }
 }

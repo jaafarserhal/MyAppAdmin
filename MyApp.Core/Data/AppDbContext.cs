@@ -81,8 +81,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.LookupId).HasColumnName("lookup_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
+
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
@@ -108,8 +109,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.LookupTypeId).HasColumnName("lookup_type_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
+
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
@@ -162,8 +164,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ClosingTime).HasColumnName("closing_time");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
+
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
@@ -215,7 +218,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email)
                 .IsRequired()
