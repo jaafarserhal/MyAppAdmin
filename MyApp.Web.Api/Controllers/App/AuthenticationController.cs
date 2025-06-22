@@ -28,19 +28,18 @@ namespace MyApp.Web.Api.Controllers.App
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] SignupRequest request)
         {
-            if (!ModelState.IsValid)
+            if (request == null)
             {
-                var validationErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
-                return BadRequest(ServiceResult<string>.ValidationFailure(validationErrors));
+                return BadRequest(AppApiResponse<string>.Failure("Request cannot be null."));
             }
-
             try
             {
 
+                // Ensure passwords match
+                if (request.Password != request.ConfirmPassword)
+                {
+                    return BadRequest(AppApiResponse<string>.Failure("Passwords do not match."));
+                }
                 var user = new User
                 {
                     FirstName = request.FirstName,
@@ -56,12 +55,12 @@ namespace MyApp.Web.Api.Controllers.App
                     return BadRequest(result);
                 }
 
-                return Ok(ServiceResult<string>.Success("User registered successfully."));
+                return Ok(AppApiResponse<string>.Success("User registered successfully."));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during signup.");
-                return StatusCode(500, ServiceResult<string>.Failure("An unexpected error occurred."));
+                return StatusCode(500, AppApiResponse<string>.Failure("An unexpected error occurred."));
             }
         }
 

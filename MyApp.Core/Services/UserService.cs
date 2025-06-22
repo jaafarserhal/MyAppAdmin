@@ -78,7 +78,7 @@ namespace MyApp.Core.Services
         }
 
         #region App
-        public async Task<ServiceResult<User>> SignupAsync(User user)
+        public async Task<AppApiResponse<User>> SignupAsync(User user)
         {
 
             try
@@ -86,7 +86,7 @@ namespace MyApp.Core.Services
                 var userExists = await _userRepository.GetByUsernameAsync(user.Email);
                 if (userExists != null)
                 {
-                    return ServiceResult<User>.Failure("User already exists");
+                    return AppApiResponse<User>.Failure("User already exists");
                 }
 
                 var userDto = new User()
@@ -101,12 +101,12 @@ namespace MyApp.Core.Services
                 };
 
                 var createdUser = await _userRepository.CreateUserAsync(userDto);
-                return ServiceResult<User>.Success(createdUser);
+                return AppApiResponse<User>.Success(createdUser);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during user signup");
-                return ServiceResult<User>.Failure("An unexpected error occurred during signup.");
+                return AppApiResponse<User>.Failure("An unexpected error occurred during signup.");
             }
         }
         #endregion
