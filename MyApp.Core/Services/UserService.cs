@@ -97,7 +97,7 @@ namespace MyApp.Core.Services
                     HashPassword = CommonUtilities.HashPassword(user.HashPassword),
                     RoleId = RoleType.Customer.AsInt(),
                     IsActive = true,
-                    // CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 var createdUser = await _userRepository.CreateUserAsync(userDto);
