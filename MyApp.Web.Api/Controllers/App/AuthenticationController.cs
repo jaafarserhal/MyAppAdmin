@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MyApp.Core.Common.Models;
 using MyApp.Core.Models;
 using MyApp.Core.Services;
+using MyApp.Core.Utilities;
 using MyApp.Web.Api.Controllers.App.Model;
 
 namespace MyApp.Web.Api.Controllers.App
@@ -38,7 +39,7 @@ namespace MyApp.Web.Api.Controllers.App
                 // Ensure passwords match
                 if (request.Password != request.ConfirmPassword)
                 {
-                    return BadRequest(AppApiResponse<string>.Failure("Passwords do not match."));
+                    return BadRequest(AppApiResponse<string>.Failure("Passwords do not match.", HttpStatusCodeEnum.Conflict));
                 }
                 var user = new User
                 {
@@ -50,12 +51,7 @@ namespace MyApp.Web.Api.Controllers.App
 
                 var result = await _userService.SignupAsync(user);
 
-                if (!result.IsSuccess)
-                {
-                    return BadRequest(result);
-                }
-
-                return Ok(AppApiResponse<string>.Success("User registered successfully."));
+                return Ok(AppApiResponse<string>.Success(result.Message));
             }
             catch (Exception ex)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MyApp.Core.Utilities;
 
 namespace MyApp.Core.Common.Models
 {
@@ -10,6 +11,7 @@ namespace MyApp.Core.Common.Models
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }
+        public int StatusCode { get; set; }
 
         public static AppApiResponse<T> Success(T data, string message = "Success")
         {
@@ -17,19 +19,22 @@ namespace MyApp.Core.Common.Models
             {
                 IsSuccess = true,
                 Data = data,
-                Message = message
+                Message = message,
+                StatusCode = HttpStatusCodeEnum.OK.AsInt()
             };
         }
 
-        public static AppApiResponse<T> Failure(string message)
+        public static AppApiResponse<T> Failure(string message, HttpStatusCodeEnum statusCode = HttpStatusCodeEnum.InternalServerError)
         {
             return new AppApiResponse<T>
             {
-                IsSuccess = false,
+                IsSuccess = statusCode == HttpStatusCodeEnum.InternalServerError ? false : true,
                 Data = default,
-                Message = message
+                Message = message,
+                StatusCode = statusCode.AsInt()
             };
         }
     }
+
 
 }

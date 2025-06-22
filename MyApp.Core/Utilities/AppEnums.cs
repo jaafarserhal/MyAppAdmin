@@ -20,4 +20,17 @@ namespace MyApp.Core.Utilities
         StoreCategory = 1,
     }
 
+    public enum HttpStatusCodeEnum
+    {
+        OK = 200,
+        BadRequest = 400,
+        Unauthorized = 401,
+        Forbidden = 403,
+        NotFound = 404,
+        Conflict = 409,
+        InternalServerError = 500,
+        // Add more as needed
+    }
+
+
 }

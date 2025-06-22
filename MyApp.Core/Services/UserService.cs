@@ -86,7 +86,7 @@ namespace MyApp.Core.Services
                 var userExists = await _userRepository.GetByUsernameAsync(user.Email);
                 if (userExists != null)
                 {
-                    return AppApiResponse<User>.Failure("User already exists");
+                    return AppApiResponse<User>.Failure("User already exists", HttpStatusCodeEnum.Conflict);
                 }
 
                 var userDto = new User()
@@ -101,12 +101,12 @@ namespace MyApp.Core.Services
                 };
 
                 var createdUser = await _userRepository.CreateUserAsync(userDto);
-                return AppApiResponse<User>.Success(createdUser);
+                return AppApiResponse<User>.Success(createdUser, "User created successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during user signup");
-                return AppApiResponse<User>.Failure("An unexpected error occurred during signup.");
+                return AppApiResponse<User>.Failure("User signup failed");
             }
         }
         #endregion
