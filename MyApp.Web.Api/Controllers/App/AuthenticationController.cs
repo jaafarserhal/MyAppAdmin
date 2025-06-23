@@ -10,6 +10,7 @@ using MyApp.Core.Models;
 using MyApp.Core.Services;
 using MyApp.Core.Utilities;
 using MyApp.Web.Api.Controllers.App.Model;
+using MyApp.Web.Api.Controllers.App.Utils;
 
 namespace MyApp.Web.Api.Controllers.App
 {
@@ -20,10 +21,13 @@ namespace MyApp.Web.Api.Controllers.App
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IUserService _userService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IUserService userService)
+        private readonly IJwtService _jwtService;
+
+        public AuthenticationController(ILogger<AuthenticationController> logger, IUserService userService, IJwtService jwtService)
         {
             _logger = logger;
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
         }
 
         [HttpPost("signup")]
@@ -41,6 +45,7 @@ namespace MyApp.Web.Api.Controllers.App
                 {
                     return BadRequest(AppApiResponse<string>.Failure("Passwords do not match.", HttpStatusCodeEnum.Conflict));
                 }
+
                 var user = new User
                 {
                     FirstName = request.FirstName,
@@ -50,6 +55,25 @@ namespace MyApp.Web.Api.Controllers.App
                 };
 
                 var result = await _userService.SignupAsync(user);
+
+                if (result.StatusCode == HttpStatusCodeEnum.OK.AsInt())
+                {
+                    // Generate JWT token
+                    var token = _jwtService.GenerateToken(result.Data);
+
+                    // Create signup response with token
+                    var signupResponse = new SignupResponse
+                    {
+                        Token = token,
+                        UserId = user.UserId.ToString(),
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Message = "Registration successful!"
+                    };
+
+                    return Ok(AppApiResponse<SignupResponse>.Success(signupResponse));
+                }
 
                 return Ok(result);
             }

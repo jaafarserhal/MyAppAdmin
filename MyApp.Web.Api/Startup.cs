@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MyApp.Core.Common.Models;
+using MyApp.Web.Api.Controllers.App.Utils;
 
 
 namespace MyApp.Web.Api
@@ -27,20 +28,23 @@ namespace MyApp.Web.Api
             var jwtSettingsSection = Configuration.GetSection("JwtSettings");
             services.Configure<JwtSettings>(jwtSettingsSection);
             var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
-            
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ValidateIssuer = false,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
-            
+
             services.AddAuthorization();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
@@ -112,7 +116,7 @@ namespace MyApp.Web.Api
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "wwwroot";
-                
+
                 if (env.IsDevelopment())
                 {
                     // In development, proxy to React dev server if needed
@@ -140,6 +144,7 @@ namespace MyApp.Web.Api
         {
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IJwtService, JwtService>();
         }
     }
 }
