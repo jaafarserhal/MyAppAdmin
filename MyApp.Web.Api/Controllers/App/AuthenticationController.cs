@@ -51,7 +51,7 @@ namespace MyApp.Web.Api.Controllers.App
 
                 var result = await _userService.SignupAsync(user);
 
-                return Ok(AppApiResponse<string>.Success(result.Message));
+                return Ok(result);
             }
             catch (Exception ex)
             {
