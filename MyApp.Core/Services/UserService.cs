@@ -78,7 +78,47 @@ namespace MyApp.Core.Services
         }
 
         #region App
-        public async Task<AppApiResponse<User>> SignupAsync(User user)
+
+
+        /// <summary>
+        /// User login method for the application
+        /// </summary>
+        /// <param name="email">User's email</param>
+        /// <param name="password">User's password</param> 
+        public async Task<AppApiResponse<User>> LoginAsync(string email, string password)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    return AppApiResponse<User>.Failure("Email and password cannot be empty", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var user = await _userRepository.GetByUsernameAsync(email);
+                if (user == null || user.HashPassword != CommonUtilities.HashPassword(password))
+                {
+                    return AppApiResponse<User>.Failure("Invalid email or password", HttpStatusCodeEnum.Unauthorized);
+                }
+
+                return AppApiResponse<User>.Success(user, "Login successful");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during user login");
+                return AppApiResponse<User>.Failure("User login failed");
+            }
+        }
+
+
+
+        /// <summary>        
+        /// User register method for the application
+        /// </summary>
+        /// <param name="user">User object containing signup details</param>
+        /// <returns>AppApiResponse containing the created user or an error message</returns>
+        /// <exception cref="ArgumentNullException">Thrown when user is null</exception>
+        /// <exception cref="Exception">Thrown when an error occurs during signup</exception>
+        public async Task<AppApiResponse<User>> RegisterAsync(User user)
         {
 
             try
@@ -105,8 +145,8 @@ namespace MyApp.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during user signup");
-                return AppApiResponse<User>.Failure("User signup failed");
+                _logger.LogError(ex, "Error during user register");
+                return AppApiResponse<User>.Failure("User signup regiister failed");
             }
         }
         #endregion

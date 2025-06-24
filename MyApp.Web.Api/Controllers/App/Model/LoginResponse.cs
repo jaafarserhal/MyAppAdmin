@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace MyApp.Web.Api.Controllers.App.Model
 {
-    public class SignupResponse
+    public class LoginResponse
     {
         public string Token { get; set; }
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

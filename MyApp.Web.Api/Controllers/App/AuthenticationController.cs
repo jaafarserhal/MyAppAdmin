@@ -30,8 +30,8 @@ namespace MyApp.Web.Api.Controllers.App
             _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
         }
 
-        [HttpPost("signup")]
-        public async Task<IActionResult> Signup([FromBody] SignupRequest request)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             if (request == null)
             {
@@ -54,7 +54,7 @@ namespace MyApp.Web.Api.Controllers.App
                     HashPassword = request.Password
                 };
 
-                var result = await _userService.SignupAsync(user);
+                var result = await _userService.RegisterAsync(user);
 
                 if (result.StatusCode == HttpStatusCodeEnum.OK.AsInt())
                 {
@@ -62,17 +62,17 @@ namespace MyApp.Web.Api.Controllers.App
                     var token = _jwtService.GenerateToken(result.Data);
 
                     // Create signup response with token
-                    var signupResponse = new SignupResponse
+                    var signupResponse = new LoginResponse
                     {
                         Token = token,
-                        UserId = user.UserId.ToString(),
+                        UserId = result.Data.UserId,
                         Email = user.Email,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Message = "Registration successful!"
                     };
 
-                    return Ok(AppApiResponse<SignupResponse>.Success(signupResponse));
+                    return Ok(AppApiResponse<LoginResponse>.Success(signupResponse));
                 }
 
                 return Ok(result);
@@ -84,6 +84,45 @@ namespace MyApp.Web.Api.Controllers.App
             }
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(AppApiResponse<string>.Failure("Request cannot be null."));
+            }
 
+            try
+            {
+                // Validate user credentials
+                var result = await _userService.LoginAsync(request.Email, request.Password);
+
+                if (result.StatusCode == HttpStatusCodeEnum.OK.AsInt())
+                {
+                    // Generate JWT token
+                    var token = _jwtService.GenerateToken(result.Data);
+
+                    // Create login response with token
+                    var loginResponse = new LoginResponse
+                    {
+                        Token = token,
+                        UserId = result.Data.UserId,
+                        Email = result.Data.Email,
+                        FirstName = result.Data.FirstName,
+                        LastName = result.Data.LastName,
+                        Message = "Login successful!"
+                    };
+
+                    return Ok(AppApiResponse<LoginResponse>.Success(loginResponse));
+                }
+
+                return Ok(AppApiResponse<string>.Failure("Invalid email or password.", HttpStatusCodeEnum.Unauthorized));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during login.");
+                return StatusCode(500, AppApiResponse<string>.Failure("An unexpected error occurred."));
+            }
+        }
     }
 }

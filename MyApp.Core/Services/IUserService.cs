@@ -20,6 +20,8 @@ namespace MyApp.Core.Services
 
         Task<User> AuthenticateAsync(string username, string password);
 
-        Task<AppApiResponse<User>> SignupAsync(User user);
+        Task<AppApiResponse<User>> RegisterAsync(User user);
+
+        Task<AppApiResponse<User>> LoginAsync(string email, string password);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyApp.Web.Api.Controllers.App.Model
 {
-    public class SignupRequest
+    public class RegisterRequest
     {
         [Required]
         public string FirstName { get; set; }
