@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyApp.Web.Api.Controllers.App.Model
+namespace MyApp.Web.Api.Controllers.App.Model.Auth
 {
     public class RegisterRequest
     {

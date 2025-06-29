@@ -17,11 +17,13 @@ public partial class User
 
     public string HashPassword { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
     public bool IsActive { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
 
     public virtual Customer Customer { get; set; }
 
     public virtual Role Role { get; set; }
+
+    public virtual ICollection<Userscode> Userscodes { get; set; } = new List<Userscode>();
 }

@@ -17,5 +17,10 @@ namespace MyApp.Core.Utilities
             var hash = sha256.ComputeHash(bytes);
             return Convert.ToBase64String(hash);
         }
+        public static string GenerateResetCode()
+        {
+            var random = new Random();
+            return random.Next(100000, 999999).ToString();
+        }
     }
 }

@@ -32,5 +32,22 @@ namespace MyApp.Core.Utilities
         // Add more as needed
     }
 
+    public enum UserStatusLookup
+    {
+        Undefined = 0,
+        Active = 100,
+        Blocked = 101,
+        ChangePasswordRequired = 102,
+        Deleted = 103
+    }
+
+   public enum UserCodeStatusLookup
+    {
+        Pending = 200,
+        Processed = 201,
+        Canceled = 202
+
+    }
+
 
 }

@@ -1,6 +1,6 @@
 
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Extensions.Configuration;
 using MyApp.Core.Models;
 using MyApp.Core.Repository.Users;
 using MyApp.Core.Services.Model;
@@ -12,12 +12,21 @@ namespace MyApp.Core.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUsersCodeRepository _usersCodeRepository;
+        private readonly IEmailService _emailService;
         private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, ILogger<UserService> logger)
+        private readonly ExpirySettings _expirySettings;
+
+
+
+        public UserService(IConfiguration configuration, IUserRepository userRepository, IUsersCodeRepository usersCodeRepository, IEmailService emailService, ILogger<UserService> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _usersCodeRepository = usersCodeRepository ?? throw new ArgumentNullException(nameof(usersCodeRepository));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _expirySettings = configuration.GetSection("ExpirySettings").Get<ExpirySettings>() ?? throw new ArgumentNullException(nameof(ExpirySettings));
         }
 
         public async Task<User> AuthenticateAsync(string username, string password)
@@ -71,7 +80,6 @@ namespace MyApp.Core.Services
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                CreatedAt = user.CreatedAt,
                 RoleName = user.Role?.Name,
                 IsActive = user.IsActive
             };
@@ -147,6 +155,150 @@ namespace MyApp.Core.Services
             {
                 _logger.LogError(ex, "Error during user register");
                 return AppApiResponse<User>.Failure("User signup regiister failed");
+            }
+        }
+
+
+        /// <summary>
+        /// Initiates password reset process by generating and sending a reset code
+        /// </summary>
+        /// <param name="email">User's email address</param>
+        /// <returns>AppApiResponse indicating success or failure</returns>
+        public async Task<AppApiResponse<string>> SendPasswordVerificationCode(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return AppApiResponse<string>.Failure("Email cannot be empty", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var user = await _userRepository.GetByUsernameAsync(email);
+                if (user == null)
+                {
+                    return AppApiResponse<string>.Failure("If the email exists, a reset code has been sent", HttpStatusCodeEnum.Conflict);
+                }
+
+                // Generate 6-digit reset code
+                var resetCode = CommonUtilities.GenerateResetCode();
+
+
+                // Create user code entry
+                var userCode = new Userscode
+                {
+                    UserId = user.UserId,
+                    Code = resetCode,
+                    StatusLookupId = UserCodeStatusLookup.Pending.AsInt(),
+                    Note = "Password reset code",
+                    IsActive = true,
+                    ExpirationTime = DateTime.UtcNow.AddMinutes(_expirySettings.PasswordResetCodeExpiryMinutes)
+                };
+
+                // Save the code
+                await _usersCodeRepository.CreateUsersCodeAsync(userCode);
+
+                // Send email with reset code
+                var emailSent = await _emailService.SendPasswordResetCodeAsync(email, resetCode);
+
+                _logger.LogInformation($"Password reset code generated for user {user.UserId}");
+
+                return AppApiResponse<string>.Success(null, "Reset code sent successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during password reset initiation");
+                return AppApiResponse<string>.Failure("Failed to initiate password reset");
+            }
+        }
+
+        /// <summary>
+        /// Verifies if a reset code is valid
+        /// </summary>
+        /// <param name="email">User's email address</param>
+        /// <param name="resetCode">6-digit reset code</param>
+        /// <returns>AppApiResponse indicating if the code is valid</returns>
+        public async Task<AppApiResponse<string>> VerifyResetCodeAsync(string email, string resetCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(resetCode))
+                {
+                    return AppApiResponse<string>.Failure("Email and reset code are required", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var user = await _userRepository.GetByUsernameAsync(email);
+                if (user == null)
+                {
+                    return AppApiResponse<string>.Failure("Invalid email or reset code", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var validCode = await _usersCodeRepository.GetValidResetCodeAsync(user.UserId, resetCode, _expirySettings.PasswordResetCodeExpiryMinutes);
+                if (validCode == null)
+                {
+                    return AppApiResponse<string>.Failure("Invalid or expired reset code", HttpStatusCodeEnum.BadRequest);
+                }
+
+                validCode.StatusLookupId = UserCodeStatusLookup.Processed.AsInt();
+                validCode.Note = "Password reset completed";
+                await _usersCodeRepository.UpdateUserCodesAsync(validCode);
+
+                return AppApiResponse<string>.Success(validCode.Code, "Reset code is valid");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during reset code verification");
+                return AppApiResponse<string>.Failure("Failed to verify reset code");
+            }
+        }
+
+        /// <summary>
+        /// Verifies reset code and updates user's password
+        /// </summary>
+        /// <param name="email">User's email address</param>
+        /// <param name="resetCode">6-digit reset code</param>
+        /// <param name="newPassword">New password</param>
+        /// <returns>AppApiResponse indicating success or failure</returns>
+        public async Task<AppApiResponse<string>> ResetPasswordAsync(string email, string resetCode, string newPassword)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(newPassword))
+                {
+                    return AppApiResponse<string>.Failure("Email and new password are required", HttpStatusCodeEnum.BadRequest);
+                }
+
+                // Validate password strength (add your own validation rules)
+                if (newPassword.Length < 6)
+                {
+                    return AppApiResponse<string>.Failure("Password must be at least 6 characters long", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var user = await _userRepository.GetByUsernameAsync(email);
+                if (user == null)
+                {
+                    return AppApiResponse<string>.Failure("Invalid Email Address", HttpStatusCodeEnum.BadRequest);
+                }
+
+                // Find valid reset code (within last 15 minutes)
+                var validCode = await _usersCodeRepository.IsUserCodeValid(user.UserId, resetCode);
+                if (!validCode)
+                {
+                    return AppApiResponse<string>.Failure("Invalid or expired reset code", HttpStatusCodeEnum.BadRequest);
+                }
+
+                // Update user's password
+                user.HashPassword = CommonUtilities.HashPassword(newPassword);
+                await _userRepository.UpdateUserAsync(user);
+
+
+                _logger.LogInformation($"Password successfully reset for user {user.UserId}");
+
+                return AppApiResponse<string>.Success(null, "Password reset successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during password reset");
+                return AppApiResponse<string>.Failure("Failed to reset password");
             }
         }
         #endregion

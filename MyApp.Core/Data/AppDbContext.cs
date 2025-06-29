@@ -28,8 +28,9 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql($"Name=ConnectionStrings:{Utilities.AppConstants.DEV_CONNECTION_NAME}");
+    public virtual DbSet<Userscode> Userscodes { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql($"Name=ConnectionStrings:{Utilities.AppConstants.DEV_CONNECTION_NAME}");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Customer>(entity =>
@@ -81,9 +82,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.LookupId).HasColumnName("lookup_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp with time zone")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
@@ -109,9 +109,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.LookupTypeId).HasColumnName("lookup_type_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp with time zone")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
@@ -164,9 +163,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ClosingTime).HasColumnName("closing_time");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp with time zone")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
@@ -217,8 +215,7 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp with time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email)
                 .IsRequired()
@@ -244,6 +241,37 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_role");
+        });
+
+        modelBuilder.Entity<Userscode>(entity =>
+        {
+            entity.HasKey(e => e.UserCodeId).HasName("userscode_pkey");
+
+            entity.ToTable("userscode");
+
+            entity.Property(e => e.UserCodeId).HasColumnName("user_code_id");
+            entity.Property(e => e.Code)
+                .IsRequired()
+                .HasColumnName("code");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.ExpirationTime).HasColumnName("expiration_time");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.Note).HasColumnName("note");
+            entity.Property(e => e.StatusLookupId).HasColumnName("status_lookup_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.StatusLookup).WithMany(p => p.Userscodes)
+                .HasForeignKey(d => d.StatusLookupId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_status_lookup");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Userscodes)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("fk_users");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MyApp.Core.Common.Models;
 using MyApp.Core.Models;
 using MyApp.Core.Services;
 using MyApp.Core.Utilities;
-using MyApp.Web.Api.Controllers.App.Model;
+using MyApp.Web.Api.Controllers.App.Model.Auth;
 using MyApp.Web.Api.Controllers.App.Utils;
 
 namespace MyApp.Web.Api.Controllers.App
@@ -122,6 +116,100 @@ namespace MyApp.Web.Api.Controllers.App
             {
                 _logger.LogError(ex, "Error during login.");
                 return StatusCode(500, AppApiResponse<string>.Failure("An unexpected error occurred."));
+            }
+        }
+
+        /// <summary>
+        /// Initiates password reset process by sending a reset code to the user's email
+        /// </summary>
+        /// <param name="request">Email address to send reset code to</param>
+        /// <returns>Success response regardless of whether email exists (for security)</returns>
+        [HttpPost("send-reset-code")]
+        [ProducesResponseType(typeof(AppApiResponse<string>), 200)]
+        [ProducesResponseType(typeof(AppApiResponse<string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> SendPasswordVerificationCode([FromBody] InitiatePasswordResetRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(AppApiResponse<string>.Failure("Request cannot be null."));
+            }
+            try
+            {
+                var result = await _userService.SendPasswordVerificationCode(request.Email);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InitiatePasswordReset API");
+                return StatusCode(500, AppApiResponse<string>.Failure("An unexpected error occurred"));
+            }
+        }
+
+        /// <summary>
+        /// Verifies if a reset code is valid
+        /// </summary>
+        /// <param name="request">Email and reset code to verify</param>
+        /// <returns>Verification result</returns>
+        [HttpPost("verify-code")]
+        [ProducesResponseType(typeof(AppApiResponse<string>), 200)]
+        [ProducesResponseType(typeof(AppApiResponse<string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(AppApiResponse<string>.Failure("Request cannot be null."));
+            }
+
+            try
+            {
+                var result = await _userService.VerifyResetCodeAsync(request.Email, request.ResetCode);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in VerifyResetCode API");
+                return StatusCode(500, AppApiResponse<string>.Failure("An unexpected error occurred"));
+            }
+        }
+
+        /// <summary>
+        /// Resets user password using the reset code
+        /// </summary>
+        /// <param name="request">Email, reset code, and new password</param>
+        /// <returns>Password reset result</returns>
+        [HttpPost("reset-password")]
+        [ProducesResponseType(typeof(AppApiResponse<string>), 200)]
+        [ProducesResponseType(typeof(AppApiResponse<string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(AppApiResponse<string>.Failure("Request cannot be null."));
+            }
+
+            try
+            {
+                if (request.NewPassword != request.ConfirmPassword)
+                {
+                    return BadRequest(AppApiResponse<string>.Failure("Passwords do not match.", HttpStatusCodeEnum.Conflict));
+                }
+
+                var result = await _userService.ResetPasswordAsync(
+                    request.Email,
+                    request.ResetCode,
+                    request.NewPassword);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in ResetPassword API");
+                return StatusCode(500, AppApiResponse<string>.Failure("An unexpected error occurred"));
             }
         }
     }

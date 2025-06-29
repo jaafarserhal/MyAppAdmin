@@ -142,9 +142,11 @@ namespace MyApp.Web.Api
         /// <param name="services"></param>
         private void RegisterServices(IServiceCollection services)
         {
+            services.AddScoped<IUsersCodeRepository, UsersCodeRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IEmailService, EmailService>();
         }
     }
 }

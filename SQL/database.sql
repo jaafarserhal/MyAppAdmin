@@ -22,6 +22,27 @@ CREATE TABLE users (
         ON DELETE SET NULL
 );
 
+CREATE TABLE UsersCode (
+    user_code_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    code TEXT NOT NULL,
+    status_lookup_id INTEGER,
+    Note TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    
+    CONSTRAINT fk_users 
+	    FOREIGN KEY (user_id)
+        REFERENCES  users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_status_lookup 
+	    FOREIGN KEY (status_lookup_id)
+        REFERENCES  gen_lookup(lookup_id)
+        ON DELETE SET NULL
+);
+
+
 
 CREATE TABLE gen_lookupType (
     lookup_type_id SERIAL PRIMARY KEY,
