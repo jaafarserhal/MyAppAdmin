@@ -8,9 +8,9 @@ namespace MyApp.Core.Repository.Users
 {
     public interface IUsersCodeRepository
     {
-        Task<Userscode> CreateUsersCodeAsync(Userscode usersCode);
-        Task<Userscode> GetValidResetCodeAsync(int userId, string resetCode, int expiryMinutes);
-        Task<Userscode> UpdateUserCodesAsync(Userscode userscode);
+        Task<UsersCode> CreateUsersCodeAsync(UsersCode usersCode);
+        Task<UsersCode> GetValidResetCodeAsync(int userId, string resetCode, int expiryMinutes);
+        Task<UsersCode> UpdateUserCodesAsync(UsersCode userscode);
 
         Task<bool> IsUserCodeValid(int userId, string resetCode);
     }

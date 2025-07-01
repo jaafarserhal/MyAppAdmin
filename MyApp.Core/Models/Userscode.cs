@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MyApp.Core.Models;
 
-public partial class Userscode
+public partial class UsersCode
 {
     public int UserCodeId { get; set; }
 

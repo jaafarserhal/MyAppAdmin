@@ -10,7 +10,7 @@ using MyApp.Core.Utilities;
 
 namespace MyApp.Core.Repository.Users
 {
-    public class UsersCodeRepository : Repository<Userscode>, IUsersCodeRepository
+    public class UsersCodeRepository : Repository<UsersCode>, IUsersCodeRepository
     {
 
         public UsersCodeRepository(AppDbContext context) : base(context)
@@ -18,18 +18,18 @@ namespace MyApp.Core.Repository.Users
 
         }
 
-        public async Task<Userscode> CreateUsersCodeAsync(Userscode usersCode)
+        public async Task<UsersCode> CreateUsersCodeAsync(UsersCode usersCode)
         {
             usersCode.CreatedAt = DateTime.UtcNow;
-            _context.Userscodes.Add(usersCode);
+            _context.UsersCodes.Add(usersCode);
             await _context.SaveChangesAsync();
             return usersCode;
         }
 
-        public async Task<Userscode> GetValidResetCodeAsync(int userId, string resetCode, int expiryMinutes)
+        public async Task<UsersCode> GetValidResetCodeAsync(int userId, string resetCode, int expiryMinutes)
         {
             // Find the reset code in the database for the given user and code
-            var validResetCode = await _context.Userscodes
+            var validResetCode = await _context.UsersCodes
                 .Where(rc => rc.UserId == userId && rc.Code == resetCode
                             && rc.IsActive
                             && rc.StatusLookupId == UserCodeStatusLookup.Pending.AsInt())
@@ -51,7 +51,7 @@ namespace MyApp.Core.Repository.Users
 
         public async Task<bool> IsUserCodeValid(int userId, string resetCode)
         {
-            var lastCode = await _context.Userscodes
+            var lastCode = await _context.UsersCodes
                 .Where(rc => rc.UserId == userId && rc.Code == resetCode && rc.IsActive)
                 .OrderByDescending(rc => rc.CreatedAt)
                 .FirstOrDefaultAsync();
@@ -61,9 +61,9 @@ namespace MyApp.Core.Repository.Users
         }
 
 
-        public async Task<Userscode> UpdateUserCodesAsync(Userscode userscode)
+        public async Task<UsersCode> UpdateUserCodesAsync(UsersCode userscode)
         {
-            _context.Userscodes.Update(userscode);
+            _context.UsersCodes.Update(userscode);
             await _context.SaveChangesAsync();
             return userscode;
         }

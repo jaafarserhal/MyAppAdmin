@@ -28,7 +28,7 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<Userscode> Userscodes { get; set; }
+    public virtual DbSet<UsersCode> UsersCodes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql($"Name=ConnectionStrings:{Utilities.AppConstants.DEV_CONNECTION_NAME}");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -243,13 +243,15 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("fk_role");
         });
 
-        modelBuilder.Entity<Userscode>(entity =>
+        modelBuilder.Entity<UsersCode>(entity =>
         {
             entity.HasKey(e => e.UserCodeId).HasName("userscode_pkey");
 
-            entity.ToTable("userscode");
+            entity.ToTable("users_code");
 
-            entity.Property(e => e.UserCodeId).HasColumnName("user_code_id");
+            entity.Property(e => e.UserCodeId)
+                .HasDefaultValueSql("nextval('userscode_user_code_id_seq'::regclass)")
+                .HasColumnName("user_code_id");
             entity.Property(e => e.Code)
                 .IsRequired()
                 .HasColumnName("code");
@@ -264,12 +266,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.StatusLookupId).HasColumnName("status_lookup_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.StatusLookup).WithMany(p => p.Userscodes)
+            entity.HasOne(d => d.StatusLookup).WithMany(p => p.UsersCodes)
                 .HasForeignKey(d => d.StatusLookupId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_status_lookup");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Userscodes)
+            entity.HasOne(d => d.User).WithMany(p => p.UsersCodes)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("fk_users");
         });

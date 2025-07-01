@@ -184,7 +184,7 @@ namespace MyApp.Core.Services
 
 
                 // Create user code entry
-                var userCode = new Userscode
+                var userCode = new UsersCode
                 {
                     UserId = user.UserId,
                     Code = resetCode,

@@ -19,5 +19,5 @@ public partial class GenLookup
 
     public virtual ICollection<Store> Stores { get; set; } = new List<Store>();
 
-    public virtual ICollection<Userscode> Userscodes { get; set; } = new List<Userscode>();
+    public virtual ICollection<UsersCode> UsersCodes { get; set; } = new List<UsersCode>();
 }
