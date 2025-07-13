@@ -53,8 +53,8 @@ namespace MyApp.Web.Api.Controllers
             var userResponse = new UserLoginResponse
             {
                 Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber
             };
             _logger.LogInformation("User {Email} logged in successfully", login.Email);
 

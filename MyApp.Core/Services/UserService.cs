@@ -78,8 +78,8 @@ namespace MyApp.Core.Services
             {
                 UserId = user.UserId,
                 Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
                 RoleName = user.Role?.Name,
                 IsActive = user.IsActive
             };
@@ -140,15 +140,17 @@ namespace MyApp.Core.Services
                 var userDto = new User()
                 {
                     Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
                     HashPassword = CommonUtilities.HashPassword(user.HashPassword),
                     RoleId = RoleType.Customer.AsInt(),
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 };
 
-                var createdUser = await _userRepository.CreateUserAsync(userDto);
+                await _userRepository.AddAsync(userDto);
+
+                var createdUser = await _userRepository.GetByUsernameAsync(user.Email);
                 return AppApiResponse<User>.Success(createdUser, "User created successfully");
             }
             catch (Exception ex)
@@ -195,7 +197,7 @@ namespace MyApp.Core.Services
                 };
 
                 // Save the code
-                await _usersCodeRepository.CreateUsersCodeAsync(userCode);
+                await _usersCodeRepository.AddAsync(userCode);
 
                 // Send email with reset code
                 var emailSent = await _emailService.SendPasswordResetCodeAsync(email, resetCode);
@@ -240,7 +242,7 @@ namespace MyApp.Core.Services
 
                 validCode.StatusLookupId = UserCodeStatusLookup.Processed.AsInt();
                 validCode.Note = "Password reset completed";
-                await _usersCodeRepository.UpdateUserCodesAsync(validCode);
+                await _usersCodeRepository.UpdateAsync(validCode);
 
                 return AppApiResponse<string>.Success(validCode.Code, "Reset code is valid");
             }
@@ -288,7 +290,7 @@ namespace MyApp.Core.Services
 
                 // Update user's password
                 user.HashPassword = CommonUtilities.HashPassword(newPassword);
-                await _userRepository.UpdateUserAsync(user);
+                await _userRepository.UpdateAsync(user);
 
 
                 _logger.LogInformation($"Password successfully reset for user {user.UserId}");

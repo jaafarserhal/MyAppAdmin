@@ -38,12 +38,12 @@ namespace MyApp.Web.Api.Controllers.App.Utils
             {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.GivenName, user.FirstName),
-            new Claim(ClaimTypes.Surname, user.LastName),
+            new Claim(ClaimTypes.GivenName, user.FullName),
+            new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
             new Claim("userId", user.UserId.ToString()),
             new Claim("email", user.Email),
-            new Claim("firstName", user.FirstName),
-            new Claim("lastName", user.LastName),
+            new Claim("fullName", user.FullName),
+            new Claim("phoneNumber", user.PhoneNumber),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };

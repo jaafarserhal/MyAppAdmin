@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using My.Core.Repository.Base;
 using MyApp.Core.Data;
 using MyApp.Core.Models;
+using MyApp.Core.Utilities;
 
 namespace MyApp.Core.Repository.Users
 {
@@ -19,47 +20,7 @@ namespace MyApp.Core.Repository.Users
         public async Task<User> GetByUsernameAsync(string username)
         {
 
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == username);
-        }
-        public async Task<User> GetUserByIdAsync(int userId)
-        {
-            return await _context.Users
-                                 .FirstOrDefaultAsync(u => u.UserId == userId);
-        }
-
-
-
-        public async Task<User> CreateUserAsync(User user)
-        {
-            user.CreatedAt = DateTime.UtcNow;
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return user;
-        }
-
-        public async Task<User> UpdateUserAsync(User user)
-        {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-            return user;
-        }
-
-        public async Task<bool> DeleteUserAsync(int userId)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return false;
-            }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == username && u.IsActive && u.RoleId == RoleType.Customer.AsInt());
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync(int page, int limit)
@@ -69,6 +30,7 @@ namespace MyApp.Core.Repository.Users
                 .OrderBy(u => u.UserId)
                 .Skip((page - 1) * limit)
                 .Take(limit)
+                .Where(u => u.IsActive)
                 .ToListAsync();
         }
 

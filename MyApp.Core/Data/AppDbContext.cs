@@ -31,6 +31,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<UsersCode> UsersCodes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql($"Name=ConnectionStrings:{Utilities.AppConstants.DEV_CONNECTION_NAME}");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Customer>(entity =>
@@ -221,20 +222,19 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(255)
                 .HasColumnName("email");
-            entity.Property(e => e.FirstName)
+            entity.Property(e => e.FullName)
                 .IsRequired()
                 .HasMaxLength(100)
-                .HasColumnName("first_name");
+                .HasColumnName("full_name");
             entity.Property(e => e.HashPassword)
                 .IsRequired()
                 .HasColumnName("hash_password");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
-            entity.Property(e => e.LastName)
-                .IsRequired()
+            entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(100)
-                .HasColumnName("last_name");
+                .HasColumnName("phone_number");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)

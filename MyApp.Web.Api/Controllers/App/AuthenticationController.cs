@@ -42,8 +42,8 @@ namespace MyApp.Web.Api.Controllers.App
 
                 var user = new User
                 {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
+                    FullName = request.FullName,
+                    PhoneNumber = request.PhoneNumber,
                     Email = request.Email,
                     HashPassword = request.Password
                 };
@@ -61,8 +61,8 @@ namespace MyApp.Web.Api.Controllers.App
                         Token = token,
                         UserId = result.Data.UserId,
                         Email = user.Email,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
+                        FullName = user.FullName,
+                        PhoneNumber = user.PhoneNumber,
                         Message = "Registration successful!"
                     };
 
@@ -102,8 +102,8 @@ namespace MyApp.Web.Api.Controllers.App
                         Token = token,
                         UserId = result.Data.UserId,
                         Email = result.Data.Email,
-                        FirstName = result.Data.FirstName,
-                        LastName = result.Data.LastName,
+                        FullName = result.Data.FullName,
+                        PhoneNumber = result.Data.PhoneNumber,
                         Message = "Login successful!"
                     };
 

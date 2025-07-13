@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MyApp.Core.Common.Models;
 using MyApp.Web.Api.Controllers.App.Utils;
+using MyApp.Core.Repository.Lookup;
 
 
 namespace MyApp.Web.Api
@@ -143,6 +144,7 @@ namespace MyApp.Web.Api
         private void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IUsersCodeRepository, UsersCodeRepository>();
+            services.AddScoped<ILookupRepository, LookupRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();

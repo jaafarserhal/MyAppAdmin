@@ -18,14 +18,6 @@ namespace MyApp.Core.Repository.Users
 
         }
 
-        public async Task<UsersCode> CreateUsersCodeAsync(UsersCode usersCode)
-        {
-            usersCode.CreatedAt = DateTime.UtcNow;
-            _context.UsersCodes.Add(usersCode);
-            await _context.SaveChangesAsync();
-            return usersCode;
-        }
-
         public async Task<UsersCode> GetValidResetCodeAsync(int userId, string resetCode, int expiryMinutes)
         {
             // Find the reset code in the database for the given user and code
@@ -58,14 +50,6 @@ namespace MyApp.Core.Repository.Users
 
             return lastCode != null
                 && lastCode.StatusLookupId == UserCodeStatusLookup.Processed.AsInt();
-        }
-
-
-        public async Task<UsersCode> UpdateUserCodesAsync(UsersCode userscode)
-        {
-            _context.UsersCodes.Update(userscode);
-            await _context.SaveChangesAsync();
-            return userscode;
         }
 
     }

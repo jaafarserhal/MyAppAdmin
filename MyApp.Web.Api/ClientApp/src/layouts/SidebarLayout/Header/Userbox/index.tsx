@@ -51,7 +51,8 @@ function HeaderUserbox() {
     return null;
   }
   const user = {
-    name: `${storedUser.firstName} ${storedUser.lastName}`,
+    name: storedUser.fullName,
+    phoneNumber: storedUser.phoneNumber,
     email: storedUser.email,
     avatar: '/static/images/avatars/admin.png',
   };

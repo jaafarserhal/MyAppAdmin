@@ -9,10 +9,10 @@ namespace MyApp.Web.Api.Controllers.App.Model.Auth
     public class RegisterRequest
     {
         [Required]
-        public string FirstName { get; set; }
+        public string FullName { get; set; }
 
         [Required]
-        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required]
         [EmailAddress]
